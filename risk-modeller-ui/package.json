@@ -1,0 +1,53 @@
+{
+  "name": "risk-modeller-ui",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --port 3030 --strictPort",
+    "build": "tsc --noEmit && vite build --mode development",
+    "build:dev": "tsc --noEmit && vite build --mode development --outDir dist-dev",
+    "build:sys": "tsc --noEmit && vite build --mode system --outDir dist-sys",
+    "build:stg": "tsc --noEmit && vite build --mode staging --outDir dist-stg",
+    "build:prd": "tsc --noEmit && vite build --mode production --outDir dist-prd",
+    "lint": "eslint .",
+    "preview": "vite preview --port 3030 --strictPort --mode development",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@mui/icons-material": "^7.3.9",
+    "@mui/material": "^7.3.9",
+    "@re/frontend-shared": "^1.1.3",
+    "@tanstack/react-query": "^5.101.1",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "react-router-dom": "^7.18.0",
+    "zustand": "^5.0.14"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@originjs/vite-plugin-federation": "^1.4.1",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/node": "^26.0.1",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.3",
+    "@vitest/coverage-v8": "^4.1.9",
+    "eslint": "^10.7.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.3",
+    "globals": "^17.7.0",
+    "jsdom": "^29.1.1",
+    "msw": "^2.14.6",
+    "typescript": "^6.0.2",
+    "typescript-eslint": "^8.62.0",
+    "vite": "^8.0.3",
+    "vitest": "^4.1.9"
+  }
+}
