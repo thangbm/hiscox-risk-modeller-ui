@@ -1,9 +1,10 @@
 import { useMemo } from 'react';
-import { Alert, Box, Divider, IconButton, Stack, Typography } from '@mui/material';
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import { Alert, Box, CircularProgress, Divider, IconButton, Stack, Typography } from '@mui/material';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
+import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArrowRight';
 import RefreshIcon from '@mui/icons-material/Refresh';
-import { Button, InlineLoading } from '@re/frontend-shared';
+import { Button } from '@re/frontend-shared';
 import { DatabaseSearchBar } from '@/features/data-import/components/DatabaseSearchBar';
 import { ExistingDatabaseList } from '@/features/data-import/components/ExistingDatabaseList';
 import { useRegisteredDatabases } from '@/features/data-import/hooks/useRegisteredDatabases';
@@ -11,11 +12,23 @@ import { useDataImportStore } from '@/features/data-import/stores/useDataImportS
 import { filterDatabases } from '@/features/data-import/utils/filterDatabases';
 
 const PANEL_WIDTH = 320;
+const PANEL_BG = '#1B2A3B';
+const BORDER_COLOR = 'rgba(255, 255, 255, 0.08)';
+
+const darkPanelTheme = createTheme({
+  palette: {
+    mode: 'dark',
+    primary: { main: '#1565C0' },
+    success: { main: '#4CAF50' },
+    background: { default: PANEL_BG, paper: PANEL_BG },
+  },
+  typography: { fontFamily: '"Helvetica Neue", Arial, sans-serif', fontSize: 14 },
+});
 
 /**
  * Inline collapsible panel that lists the databases already registered with
- * Data Bridge. Replaces the slide-out Drawer; sits flush with the page left
- * edge inside the DataImportPage layout.
+ * Data Bridge. Dark-themed; sits flush with the icon sidebar inside the
+ * DataImportPage layout.
  */
 export const ExistingDatabasesPanel = () => {
   const isOpen = useDataImportStore((state) => state.isDrawerOpen);
@@ -38,10 +51,10 @@ export const ExistingDatabasesPanel = () => {
     return (
       <Box
         sx={{
-          width: 24,
+          width: 20,
           flexShrink: 0,
-          borderRight: 1,
-          borderColor: 'divider',
+          bgcolor: PANEL_BG,
+          borderRight: `1px solid ${BORDER_COLOR}`,
           display: 'flex',
           alignItems: 'flex-start',
           pt: 0.5,
@@ -51,76 +64,124 @@ export const ExistingDatabasesPanel = () => {
           size="small"
           aria-label="Expand Existing Databases"
           onClick={toggleDrawer}
-          sx={{ borderRadius: 0 }}
+          sx={{ color: 'rgba(255,255,255,0.55)', p: 0, borderRadius: 0 }}
         >
-          <ChevronRightIcon fontSize="small" />
+          <KeyboardDoubleArrowRightIcon fontSize="small" />
         </IconButton>
       </Box>
     );
   }
 
   return (
-    <Box
-      sx={{
-        width: PANEL_WIDTH,
-        flexShrink: 0,
-        borderRight: 1,
-        borderColor: 'divider',
-        bgcolor: 'background.paper',
-        display: 'flex',
-        flexDirection: 'column',
-        overflow: 'hidden',
-      }}
-    >
-      <Stack
-        direction="row"
-        alignItems="flex-start"
-        justifyContent="space-between"
-        sx={{ p: 2, pb: 1.5 }}
+    <ThemeProvider theme={darkPanelTheme}>
+      <Box
+        sx={{
+          width: PANEL_WIDTH,
+          flexShrink: 0,
+          bgcolor: 'background.default',
+          borderRight: `1px solid ${BORDER_COLOR}`,
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'hidden',
+        }}
       >
-        <Box sx={{ flex: 1, minWidth: 0 }}>
-          <Typography variant="subtitle1" fontWeight="medium">
-            Existing Databases
-          </Typography>
-          <Typography variant="caption" color="text.secondary">
-            All databases attached to Data Bridge and registered for Risk Modeller.
-          </Typography>
-        </Box>
-        <Stack direction="row" alignItems="center" sx={{ flexShrink: 0, ml: 1, mt: -0.5 }}>
+        {/* ── Panel header ── */}
+        <Stack
+          direction="row"
+          alignItems="flex-start"
+          justifyContent="space-between"
+          sx={{ px: 2, pt: 2, pb: 1.5 }}
+        >
+          <Box sx={{ flex: 1, minWidth: 0 }}>
+            <Typography variant="subtitle1" fontWeight="bold" color="text.primary">
+              Existing Databases
+            </Typography>
+            <Typography variant="caption" color="text.secondary" sx={{ lineHeight: 1.4 }}>
+              All databases attached to Data Bridge and registered for Risk Modeller.
+            </Typography>
+          </Box>
           <IconButton
             size="small"
-            aria-label="Refresh databases"
-            disabled={isFetching}
-            onClick={() => void refetch()}
+            aria-label="Collapse panel"
+            onClick={toggleDrawer}
+            sx={{ color: 'text.secondary', flexShrink: 0, mt: -0.5, ml: 0.5 }}
           >
-            <RefreshIcon fontSize="small" />
-          </IconButton>
-          <IconButton size="small" aria-label="Collapse panel" onClick={toggleDrawer}>
-            <ChevronLeftIcon fontSize="small" />
+            <KeyboardDoubleArrowLeftIcon fontSize="small" />
           </IconButton>
         </Stack>
-      </Stack>
 
-      <Divider />
+        <Divider sx={{ borderColor: BORDER_COLOR }} />
 
-      <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
-        {isLoading && <InlineLoading message="Loading databases" />}
-
-        {!isLoading && error && (
-          <Alert
-            severity="error"
-            action={
-              <Button tier="tertiary" size="small" onClick={() => void refetch()}>
-                Retry
-              </Button>
-            }
+        {/* ── Source filter row ── */}
+        <Stack
+          direction="row"
+          alignItems="center"
+          justifyContent="space-between"
+          sx={{ px: 2, py: 1 }}
+        >
+          <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
+            Registered Databases (Data Bridge Source)
+          </Typography>
+          <Box
+            sx={{
+              border: '1px solid',
+              borderColor: isFetching ? 'warning.main' : 'rgba(255,255,255,0.22)',
+              borderRadius: 0.75,
+              width: 28,
+              height: 28,
+              flexShrink: 0,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
           >
-            Failed to load the registered databases.
-          </Alert>
-        )}
+            <IconButton
+              size="small"
+              aria-label="Refresh databases"
+              disabled={isFetching}
+              onClick={() => void refetch()}
+              sx={{
+                p: 0,
+                color: isFetching ? 'warning.main' : 'text.secondary',
+                '&:hover': { bgcolor: 'transparent', color: 'text.primary' },
+              }}
+            >
+              {isFetching ? (
+                <CircularProgress size={14} color="warning" />
+              ) : (
+                <RefreshIcon sx={{ fontSize: 16 }} />
+              )}
+            </IconButton>
+          </Box>
+        </Stack>
 
-        {!isLoading && !error && (
-          <Stack spacing={1}>
+        <Divider sx={{ borderColor: BORDER_COLOR }} />
+
+        {/* ── Search + list ── */}
+        <Box sx={{ px: 2, pt: 1.5, pb: 1 }}>
+          {isLoading && (
+            <Stack direction="row" alignItems="center" spacing={1} sx={{ py: 1 }}>
+              <CircularProgress size={14} />
+              <Typography variant="caption" color="text.secondary">
+                Loading databases…
+              </Typography>
+            </Stack>
+          )}
+
+          {!isLoading && error && (
+            <Alert
+              severity="error"
+              action={
+                <Button tier="tertiary" size="small" onClick={() => void refetch()}>
+                  Retry
+                </Button>
+              }
+            >
+              Failed to load the registered databases.
+            </Alert>
+          )}
+
+          {!isLoading && !error && (
             <DatabaseSearchBar
               query={searchQuery}
               matchMode={matchMode}
@@ -130,6 +191,11 @@ export const ExistingDatabasesPanel = () => {
               onMatchModeChange={setMatchMode}
               onClear={clearSearch}
             />
+          )}
+        </Box>
+
+        {!isLoading && !error && (
+          <Box sx={{ flex: 1, overflow: 'auto' }}>
             <ExistingDatabaseList
               databases={filteredDatabases}
               emptyMessage={
@@ -138,19 +204,9 @@ export const ExistingDatabasesPanel = () => {
                   : 'No databases match your search.'
               }
             />
-            {databases.length > 0 && filteredDatabases.length === 0 && (
-              <Button
-                tier="tertiary"
-                size="small"
-                onClick={clearSearch}
-                sx={{ alignSelf: 'flex-start' }}
-              >
-                Clear search
-              </Button>
-            )}
-          </Stack>
+          </Box>
         )}
       </Box>
-    </Box>
+    </ThemeProvider>
   );
 };

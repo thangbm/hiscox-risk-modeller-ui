@@ -1,4 +1,5 @@
-import { List, ListItem, ListItemText, Typography } from '@mui/material';
+import { List, ListItem, ListItemIcon, ListItemText, Typography } from '@mui/material';
+import StorageIcon from '@mui/icons-material/Storage';
 import type { RegisteredDatabase } from '@/types/api';
 import { formatSyncedTime } from '@/features/data-import/utils/formatSyncedTime';
 
@@ -18,7 +19,7 @@ export const ExistingDatabaseList = ({
 }: ExistingDatabaseListProps) => {
   if (databases.length === 0) {
     return (
-      <Typography variant="body2" color="text.secondary" sx={{ py: 2 }}>
+      <Typography variant="body2" color="text.secondary" sx={{ py: 2, px: 2 }}>
         {emptyMessage}
       </Typography>
     );
@@ -27,11 +28,17 @@ export const ExistingDatabaseList = ({
   return (
     <List dense disablePadding aria-label="Existing databases">
       {databases.map((database) => (
-        <ListItem key={database.id} disableGutters divider>
+        <ListItem key={database.id} disableGutters divider sx={{ px: 2 }}>
+          <ListItemIcon sx={{ minWidth: 32 }}>
+            <StorageIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+          </ListItemIcon>
           <ListItemText
             primary={database.name}
-            secondary={`Last synced: ${formatSyncedTime(database.lastSyncedUtc)}`}
-            slotProps={{ primary: { variant: 'body2', sx: { wordBreak: 'break-all' } } }}
+            secondary={`Last-synced: ${formatSyncedTime(database.lastSyncedUtc)}`}
+            slotProps={{
+              primary: { variant: 'body2', sx: { wordBreak: 'break-all', fontWeight: 500 } },
+              secondary: { variant: 'caption' },
+            }}
           />
         </ListItem>
       ))}
